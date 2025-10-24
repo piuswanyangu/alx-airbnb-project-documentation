@@ -69,7 +69,7 @@ The backend is a modular Node.js service exposing REST APIs to clients. PostgreS
 • A03: Monitor booking and system activity
 • A04: Manage reported reviews
 
-4. FUNCTIONAL REQUIREMENTS
+4. Features and functionalities
 4.1 Authentication & Authorization
 
 • Users register with email/password or social login
