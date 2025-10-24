@@ -1,256 +1,263 @@
-✅ AIRBNB CLONE BACKEND
+✅ Task 0: Features and Functionalities Documentation
 
-Enterprise Full Documentation (Final Version)
-Database: PostgreSQL
-Architecture: Modular REST API
-Notifications: Email only
-Authentication: Email + Social OAuth (Google/Facebook)
-Payment: Mocked Integration
-Search: Filtering & Query Operations
+📌 File:
+features-and-functionalities/README.md
 
-────────────────────────────────────────
+# Airbnb Clone Backend: Features and Functionalities
 
-1. INTRODUCTION
-1.1 Purpose
+## 1. User Management
+- User registration (email + password)
+- Social login (Google)
+- Secure password hashing
+- Email verification
+- Edit and update profile
+- Role based access (Guest, Host, Admin)
 
-This Software Requirements Specification (SRS) describes the backend system for an Airbnb-like rental booking platform, defining user roles, functionalities, database and API specifications, and operational constraints.
+## 2. Property Listings Management (Host Only)
+- Create property listing
+- Upload images
+- Update property details
+- Delete listing
+- Set availability calendar
 
-1.2 Scope
+## 3. Search and Filtering (Guest)
+- Search by location
+- Filter by:
+  - Price range
+  - Number of guests
+  - Amenities
+  - Ratings
+- Pagination support
 
-The backend system provides:
-• Secure authentication and authorization
-• Property listing and hosting operations
-• Search, filtering, and property discovery
-• Booking lifecycle management
-• Reviews and ratings
-• Basic email notification system
-• Admin management capabilities
+## 4. Booking Management
+- Check availability
+- Create a reservation
+- Cancel reservation
+- Booking statuses:
+  - Pending
+  - Confirmed
+  - Cancelled
+  - Completed
 
-Front-end is out of scope for this document.
+## 5. Payment Processing (Mocked)
+- Collect payment on booking
+- Payment confirmation response
+- Payment failure messaging
 
-1.3 Definitions
-Term	Meaning
-Host	A user who lists properties
-Guest	A user who books properties
-Listing	A rental property
-Booking	A confirmed reservation
-1.4 Target Users
+## 6. Reviews and Ratings
+- Guests review properties
+- Ratings 1–5
+- Hosts view reviews
 
-• Guests
-• Hosts
-• Admins
+## 7. Notification System
+- Email notifications for:
+  - Booking confirmation
+  - Booking cancellation
+  - Payment result
 
-2. SYSTEM OVERVIEW
-
-The backend is a modular Node.js service exposing REST APIs to clients. PostgreSQL stores all persistent data. All operations enforce RBAC (Role-Based Access Control).
-
-3. USER ROLES AND USER STORIES
-3.1 Guest
-
-• G01: Register and authenticate
-• G02: Update profile and view bookings
-• G03: Search properties by location, price, amenities, etc.
-• G04: Book properties (mocked payment checkout)
-• G05: Receive email booking confirmation
-• G06: Submit reviews after stay
-
-3.2 Host
-
-• H01: Authenticate as Host
-• H02: Create, update, and delete property listings
-• H03: Manage availability calendars
-• H04: View bookings on owned properties
-• H05: Receive booking notifications by email
-
-3.3 Admin
-
-• A01: View and manage all users
-• A02: Remove inappropriate listings
-• A03: Monitor booking and system activity
-• A04: Manage reported reviews
-
-4. Features and functionalities
-4.1 Authentication & Authorization
-
-• Users register with email/password or social login
-• JWT-based authentication
-• Strong password validation
-• RBAC with Admin, Host, Guest levels
-
-4.2 Property Management (Host Only)
-
-• CRUD operations for listings
-• Upload property media (object storage integration planned)
-• Pricing and availability configuration
-
-4.3 Search & Filtering
-
-Supported filters:
-• Location
-• Price range
-• Amenities
-• Rating
-• Property type
-Includes pagination and result sorting.
-
-4.4 Booking Management
-
-• Prevent overlapping bookings
-• Mock payment gateway integration
-• Refund logic documented as stub
-• Validation on stay duration and availability
-
-4.5 Reviews & Ratings
-
-• Guests review only after confirmed stay
-
-5. NON-FUNCTIONAL REQUIREMENTS
-Category	Requirement
-Security	Encrypted passwords (bcrypt), secure JWT rotation
-Availability	99 percent uptime target
-Scalability	Modular architecture, index-optimized DB schema
-Performance	Search response under 2 seconds under normal load
-Maintainability	Service separation and clean folder structure
-Auditability	Admin activity monitoring through logs
-6. ENTITY RELATIONSHIP MODEL
-
-(Text-Only Specification)
-
-6.1 Tables and Attributes
-1. users
-Column	Type	Notes
-id	SERIAL PK	
-full_name	VARCHAR	
-email	VARCHAR UNIQUE	
-password_hash	TEXT	
-role	ENUM('guest','host','admin')	
-created_at	TIMESTAMP	
-updated_at	TIMESTAMP	
-2. properties
-Column	Type
-id	SERIAL PK
-host_id	INT FK → users(id)
-title	VARCHAR
-description	TEXT
-address	VARCHAR
-price_per_night	DECIMAL
-property_type	VARCHAR
-created_at	TIMESTAMP
-updated_at	TIMESTAMP
-3. property_images
-Column	Type
-id	SERIAL PK
-property_id	FK → properties(id)
-image_url	TEXT
-4. bookings
-Column	Type
-id	SERIAL PK
-guest_id	FK → users(id)
-property_id	FK → properties(id)
-start_date	DATE
-end_date	DATE
-total_price	DECIMAL
-status	ENUM('pending','confirmed','cancelled')
-created_at	TIMESTAMP
-5. reviews
-Column	Type
-id	SERIAL PK
-guest_id	FK → users(id)
-property_id	FK → properties(id)
-rating	INT
-comment	TEXT
-created_at	TIMESTAMP
-6.2 Relationships
-
-• One Host has many Properties
-• One Guest can have many Bookings
-• One Property has many Bookings
-• One Guest can leave many Reviews
-• One Property has many Reviews
-
-You will add the rendered ERD diagram as an image separately.
-
-7. API DOCUMENTATION (REST)
-
-Base URL:
-
-/api/v1
-
-7.1 Authentication Routes
-Method	Endpoint	Access
-POST	/auth/register	Public
-POST	/auth/login	Public
-POST	/auth/social-login	Public
-GET	/auth/me	Authenticated
-7.2 Property Routes (Host Only)
-Method	Endpoint	Description
-POST	/properties	Create listing
-GET	/properties/host	Host listings
-PUT	/properties/:id	Update listing
-DELETE	/properties/:id	Remove listing
-7.3 Public Property Search
-Method	Endpoint
-GET	/properties?location=&price_min=&price_max=&amenities=
-7.4 Booking Routes
-Method	Endpoint
-POST	/bookings
-GET	/bookings/me
-PATCH	/bookings/:id/cancel
-7.5 Reviews Routes
-Method	Endpoint
-POST	/reviews
-GET	/properties/:id/reviews
-7.6 Admin Routes
-Method	Endpoint
-GET	/admin/users
-DELETE	/admin/properties/:id
-8. BACKEND ARCHITECTURE & FOLDER STRUCTURE
-src/
-│
-├── config/
-├── controllers/
-├── middleware/
-├── models/
-├── routes/
-├── services/
-├── utils/
-└── app.js
+## 8. Admin Capabilities
+- View users
+- View listings
+- Deactivate fraud accounts
+- Remove inappropriate listings
 
 
-Principles
-• Controllers only handle HTTP request lifecycle
-• Business rules abstracted to services
-• Validation through middleware
-• Database via models and query helpers
+✅ Commit this before proceeding.
 
-9. SECURITY & COMPLIANCE
-Requirement	Implementation
-Password safety	Bcrypt salted hashing
-JWT protection	Expiry + refresh token strategy
-Input validation	Joy/Zod schemas
-Authorization	Role checks for restricted routes
-SQL Injection prevention	Parameterized queries
-10. EMAIL NOTIFICATIONS
+✅ Task 1: Use Case Diagram
 
-Triggered events:
-• Booking confirmation to Guest
-• Booking notification to Host
+📌 File:
+use-case-diagram/README.md
+Image: use-case-diagram.png
 
-Using lightweight queue or direct SMTP initially.
+Instruction for Draw.io
 
-11. PAYMENT FLOW (MOCK)
+Include actors:
 
-Booking requests:
-• System computes total price
-• Marks status “pending”
-• After mock payment, status becomes “confirmed”
+Guest
 
-Real provider integration possible in future.
+Host
 
-12. FUTURE ROADMAP
-Feature	Description
-Real payment gateway	Stripe or PayPal
-Image hosting	Cloudinary or S3
-Real-time notifications	WebSockets or push
-Multi-currency support	Exchange rate API
-Host analytics dashboards	Revenue and load statistics
+Admin
+
+Payment System (External)
+
+Include core interactions:
+
+Register/Login
+
+Manage Listings (Host)
+
+Search Properties (Guest)
+
+Create Booking
+
+Process Payment
+
+Manage Users (Admin)
+
+✅ After exporting PNG, embed this text in README.md:
+
+# Use Case Diagram
+This diagram illustrates actors and their interactions with core system features.
+
+![Use Case Diagram](./use-case-diagram.png)
+
+✅ Task 2: User Stories
+
+📌 File:
+user-stories/user-stories.md
+
+✅ Already approved structure:
+
+# Core User Stories for Airbnb Clone Backend
+
+## Authentication & Authorization
+1. As a user, I want to register an account, so that I can access the platform.
+2. As a user, I want to log in securely, so that I can verify my identity.
+3. As a user, I want to login with Google, so that I can access the system faster.
+4. As a user, I want JWT authentication, so that my session remains secure.
+
+## Guest Stories
+5. As a guest, I want to search properties, so that I can find a suitable place to stay.
+6. As a guest, I want to book a property, so that I can reserve my accommodation.
+7. As a guest, I want to cancel a booking, so that I have flexibility.
+8. As a guest, I want to leave a review, so that I share feedback.
+
+## Host Stories
+9. As a host, I want to add a listing, so that guests can book my property.
+10. As a host, I want to manage my listings, so that I can keep information updated.
+11. As a host, I want to view bookings, so that I prepare for guests.
+
+## Admin Stories
+12. As an admin, I want to monitor users, so that I maintain system security.
+13. As an admin, I want to remove inappropriate content, so that the platform remains trustworthy.
+
+
+✅ Add README.md that just links to this file.
+
+✅ Task 3: Data Flow Diagram
+
+📌 Folder + File:
+data-flow-diagram/data-flow.png
+Text: data-flow-diagram/README.md
+
+Elements to include in Draw.io
+
+📌 Processes:
+
+Auth Service
+
+Listing Service
+
+Booking Service
+
+Payment System (external)
+
+Notification Service
+
+📌 Data Stores:
+
+Users
+
+Properties
+
+Bookings
+
+Payments
+
+Reviews
+
+📌 Flow examples:
+Guest → Search Request → System → Listings DB → Response
+
+✅ README.md content:
+
+# Data Flow Diagram
+
+The Data Flow Diagram illustrates how data interacts between users, backend services, and the database.
+
+![Data Flow Diagram](./data-flow.png)
+
+✅ Task 4: Flowchart (Choose User Registration Process)
+
+📌 Folder + File:
+flowcharts/data-flow-diagram.png
+Text: flowcharts/README.md
+
+Flowchart steps:
+
+User submits registration form
+
+Validate input
+
+Hash password
+
+Store in Users DB
+
+Send verification email
+
+Return success response
+
+✅ README.md content:
+
+# User Registration Flowchart
+
+This flowchart shows the sequence of system actions during user registration.
+
+![Flowchart](./data-flow-diagram.png)
+
+✅ Task 5: Requirements Specification
+
+📌 File:
+requirements.md
+
+# Airbnb Clone Backend: Requirements Specification
+
+## 1. API Requirements
+
+### Authentication API
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | /auth/register | Create user account | None |
+| POST | /auth/login | Authenticate user | None |
+| GET | /auth/profile | Get user profile | JWT |
+| PUT | /auth/profile | Update profile | JWT |
+
+### Property API (Host)
+| Method | Endpoint | Description | Role |
+|--------|----------|-------------|------|
+| POST | /properties | Add new listing | Host |
+| GET | /properties/:id | Get property | Public |
+| PUT | /properties/:id | Update listing | Host |
+| DELETE | /properties/:id | Remove listing | Host |
+
+### Booking API
+| Method | Endpoint | Description | Role |
+|--------|----------|-------------|------|
+| POST | /bookings | Create booking | Guest |
+| GET | /bookings/:id | View booking | Auth |
+| DELETE | /bookings/:id | Cancel booking | Auth |
+
+### Payment API
+| POST | /payments/checkout | Mock checkout | Guest |
+
+### Review API
+| POST | /reviews | Add review | Guest |
+| GET | /reviews/:propertyId | View reviews | Public |
+
+## 2. Data Validation Rules
+- Email format validation
+- Password minimum length: 8 characters
+- Booking dates cannot overlap
+- Listings must have title, price, location
+
+## 3. Performance Requirements
+- Requests respond within 200–500ms average
+- Search results paginated
+
+## 4. Security Requirements
+- Bcrypt password hashing
+- JWT authentication
+- SQL Injection protection
+- Role-based authorization
