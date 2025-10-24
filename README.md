@@ -1,7 +1,7 @@
 Features & Functionalities — Airbnb Clone (Backend)
 Project summary
 
-This document enumerates the features and functional requirements for the Airbnb Clone backend. The system is a modular, service-oriented REST API using PostgreSQL for persistence. The documentation emphasizes clarity, acceptance criteria, and developer-ready detail suitable for ALX submission and professional review.
+This document enumerates the features and functional requirements for the Airbnb Clone backend. The system is a modular, service-oriented REST API using PostgreSQL for persistence. The documentation emphasizes clarity, acceptance criteria, and developer-ready detail suitable for  professional review.
 
 Table of contents
 
